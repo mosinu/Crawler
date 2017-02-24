@@ -1,39 +1,58 @@
 ﻿namespace Crawler
 {
-    partial class Form1
+    public partial class Form1 : Form
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        String Rstring;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
+        public Form1()
         {
-            if (disposing && (components != null))
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+            WebRequest myWebRequest;
+            WebResponse myWebResponse;
+            String URL = textBox1.Text;
+
+            myWebRequest = WebRequest.Create(URL);
+            myWebResponse = myWebRequest.GetResponse();//Returns a response from an Internet resource
+
+            Stream streamResponse = myWebResponse.GetResponseStream();//return the data stream from the internet
+                                                                      //and save it in the stream
+
+            StreamReader sreader = new StreamReader(streamResponse);//reads the data stream
+            Rstring = sreader.ReadToEnd();//reads it to the end
+            String Links = GetContent(Rstring);//gets the links only
+
+            textBox2.Text = Rstring;
+            textBox3.Text = Links;
+            streamResponse.Close();
+            sreader.Close();
+            myWebResponse.Close();
+
+
+
+
+        }
+
+        private String GetContent(String Rstring)
+        {
+            String sString = "";
+            HTMLDocument d = new HTMLDocument();
+            IHTMLDocument2 doc = (IHTMLDocument2)d;
+            doc.write(Rstring);
+
+            IHTMLElementCollection L = doc.links;
+
+            foreach (IHTMLElement links in L)
             {
-                components.Dispose();
+                sString += links.getAttribute("href", 0);
+                sString += "/n";
             }
-            base.Dispose(disposing);
+            return sString;
         }
-
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Text = "Form1";
-        }
-
-        #endregion
     }
 }
 
